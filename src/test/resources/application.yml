@@ -1,0 +1,6 @@
+spring:
+  data:
+    mongodb:
+      database: notes
+      port: ${mongodb.container.port}
+      host: localhost
