@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface NoteRepository extends MongoRepository<Note, Long> {
+public interface NoteRepository extends MongoRepository<Note, String> {
 
 //    @Query("{name:'?0'}")
 //    Note findItemByName(String name);

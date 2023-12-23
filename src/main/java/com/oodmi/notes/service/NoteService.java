@@ -1,8 +1,11 @@
 package com.oodmi.notes.service;
 
-import com.oodmi.notes.model.Note;
+import com.oodmi.notes.converter.NoteConverter;
+import com.oodmi.notes.dto.NoteDto;
 import com.oodmi.notes.repository.NoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,29 +15,44 @@ import java.util.*;
 public class NoteService {
 
     private final NoteRepository repository;
+    private final NoteConverter converter;
 
-    public List<Note> getAll() {
-        return repository.findAll();
+    public List<NoteDto> getAll(int page, int sizePerPage) {
+        var pageable = PageRequest.of(page, sizePerPage, Sort.Direction.DESC, "createdDate");
+
+        return repository.findAll(pageable)
+                .stream()
+                .map(converter::convert)
+                .toList();
     }
 
-    public Note getById(Long id) {
+    public NoteDto getById(String id) {
         return repository.findById(id)
+                .map(converter::convertWithText)
                 .orElseThrow(() -> new IllegalArgumentException());
     }
 
-    public Note create(Note note) {
-        return repository.save(note);
+    public NoteDto create(NoteDto noteDto) {
+        var note = converter.convert(noteDto);
+        repository.insert(note);
+
+        return noteDto.setId(note.getId());
     }
 
-    public Note update(Long id, Note note) {
-        return repository.save(note.setId(id));
+    public NoteDto update(String id, NoteDto noteDto) {
+        var saved = getById(id);
+        noteDto.setId(saved.getId());
+        var note = converter.convert(noteDto);
+        repository.save(note);
+
+        return noteDto;
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         repository.deleteById(id);
     }
 
-    public Map<String, Long> getStats(Long id) {
+    public Map<String, Long> getStats(String id) {
         var node = getById(id);
 
         String[] split = node.getText().split(" ");

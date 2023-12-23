@@ -1,12 +1,12 @@
 package com.oodmi.notes.validator;
 
-import com.oodmi.notes.model.Note;
+import com.oodmi.notes.dto.NoteDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class NoteValidator {
 
-    public void validate(Note note) {
+    public void validate(NoteDto note) {
         if (note.getText() == null) {
             throw new IllegalArgumentException("text");
         }
