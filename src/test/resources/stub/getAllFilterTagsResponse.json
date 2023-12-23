@@ -1,0 +1,20 @@
+[
+  {
+    "id": "658745a46c963c75a6b18a23",
+    "title": "Title 2",
+    "createdDate": "2023-12-24",
+    "tags": [
+      "PERSONAL",
+      "IMPORTANT"
+    ]
+  },
+  {
+    "id": "658745a46c963c75a6b18a22",
+    "title": "Title 1",
+    "createdDate": "2023-12-23",
+    "tags": [
+      "PERSONAL",
+      "IMPORTANT"
+    ]
+  }
+]

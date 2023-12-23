@@ -2,6 +2,7 @@ package com.oodmi.notes.controller;
 
 
 import com.oodmi.notes.dto.NoteDto;
+import com.oodmi.notes.model.Tag;
 import com.oodmi.notes.service.NoteService;
 import com.oodmi.notes.validator.NoteValidator;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,9 @@ public class NoteController {
 
     @GetMapping
     public List<NoteDto> getAll(@RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "5") int sizePerPage) {
-        return service.getAll(page, sizePerPage);
+                                @RequestParam(defaultValue = "5") int sizePerPage,
+                                @RequestParam(defaultValue = "") List<Tag> tags) {
+        return service.getAll(page, sizePerPage, tags);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +40,7 @@ public class NoteController {
 
     @PutMapping("/{id}")
     public NoteDto update(@PathVariable String id,
-                       @RequestBody NoteDto note) {
+                          @RequestBody NoteDto note) {
         validator.validate(note);
         return service.update(id, note);
     }

@@ -2,6 +2,7 @@ package com.oodmi.notes.service;
 
 import com.oodmi.notes.converter.NoteConverter;
 import com.oodmi.notes.dto.NoteDto;
+import com.oodmi.notes.model.Tag;
 import com.oodmi.notes.repository.NoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -17,19 +18,26 @@ public class NoteService {
     private final NoteRepository repository;
     private final NoteConverter converter;
 
-    public List<NoteDto> getAll(int page, int sizePerPage) {
+    public List<NoteDto> getAll(int page, int sizePerPage, List<Tag> tags) {
         var pageable = PageRequest.of(page, sizePerPage, Sort.Direction.DESC, "createdDate");
 
-        return repository.findAll(pageable)
-                .stream()
-                .map(converter::convert)
-                .toList();
+        if (tags.isEmpty()) {
+            return repository.findAll(pageable)
+                    .stream()
+                    .map(converter::convert)
+                    .toList();
+        } else {
+            return repository.findAllFilterTags(tags, pageable)
+                    .stream()
+                    .map(converter::convert)
+                    .toList();
+        }
     }
 
     public NoteDto getById(String id) {
         return repository.findById(id)
                 .map(converter::convertWithText)
-                .orElseThrow(() -> new IllegalArgumentException());
+                .orElseThrow(() -> new IllegalArgumentException("note does not exist"));
     }
 
     public NoteDto create(NoteDto noteDto) {

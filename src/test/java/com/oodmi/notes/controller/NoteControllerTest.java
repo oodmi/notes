@@ -54,7 +54,7 @@ public class NoteControllerTest {
     void getAllTest(@Value("classpath:stub/getAllResponse.json")
                     Resource response) throws Exception {
         createNoteAndGetId();
-        createAnotherNoteAndGetId();
+        createAnotherNote();
 
         String actual = mockMvc.perform(get("/notes")
                         .contentType("application/json"))
@@ -69,11 +69,43 @@ public class NoteControllerTest {
     void getSecondPageTest(@Value("classpath:stub/getSecondPageResponse.json")
                            Resource response) throws Exception {
         createNoteAndGetId();
-        createAnotherNoteAndGetId();
+        createAnotherNote();
 
         String actual = mockMvc.perform(get("/notes")
                         .queryParam("page", "1")
                         .queryParam("sizePerPage", "1")
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONAssert.assertEquals(asString(response), actual,
+                new CustomComparator(STRICT, new Customization("[*].id", (it1, it2) -> true)));
+    }
+
+    @Test
+    void getAllFilterTagsEmptyTest() throws Exception {
+        createNoteAndGetId();
+        createAnotherNote();
+
+        String actual = mockMvc.perform(get("/notes")
+                        .queryParam("page", "1")
+                        .queryParam("sizePerPage", "1")
+                        .queryParam("tags", "BUSINESS")
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONAssert.assertEquals("[]", actual, true);
+    }
+
+    @Test
+    void getAllFilterTagsTest(@Value("classpath:stub/getAllFilterTagsResponse.json")
+                              Resource response) throws Exception {
+        createNoteAndGetId();
+        createAnotherNote();
+
+        String actual = mockMvc.perform(get("/notes")
+                        .queryParam("tags", "PERSONAL", "IMPORTANT")
                         .contentType("application/json"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -156,13 +188,12 @@ public class NoteControllerTest {
                 .getId();
     }
 
-    private String createAnotherNoteAndGetId() {
-        return repository.save(new Note()
+    private void createAnotherNote() {
+        repository.save(new Note()
                         .setTitle("Title 2")
                         .setText("another note is just a note")
                         .setCreatedDate(LocalDate.of(2023, 12, 24))
-                        .setTags(List.of(Tag.PERSONAL, Tag.IMPORTANT)))
-                .getId();
+                        .setTags(List.of(Tag.PERSONAL, Tag.IMPORTANT)));
     }
 
     private String asString(Resource resource) {
