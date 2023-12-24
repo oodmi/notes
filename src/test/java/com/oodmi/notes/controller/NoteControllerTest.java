@@ -1,10 +1,11 @@
 package com.oodmi.notes.controller;
 
 
-import com.oodmi.notes.config.MongoDBTestContainerConfig;
+import com.oodmi.notes.container.MongoDBContainer;
 import com.oodmi.notes.model.Note;
 import com.oodmi.notes.model.Tag;
 import com.oodmi.notes.repository.NoteRepository;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.FileCopyUtils;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,7 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = MongoDBTestContainerConfig.class)
+@ContextConfiguration(initializers = NoteControllerTest.Initializer.class)
+@Testcontainers
 public class NoteControllerTest {
 
     @Autowired
@@ -206,4 +211,10 @@ public class NoteControllerTest {
         }
     }
 
+    public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @Override
+        public void initialize(@NotNull ConfigurableApplicationContext applicationContext) {
+            MongoDBContainer.apply(applicationContext);
+        }
+    }
 }

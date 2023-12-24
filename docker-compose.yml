@@ -7,11 +7,21 @@ services:
     container_name: mongo-test
     ports:
       - '27017:27017'
-    volumes:
-      - dbdata6:/data/db
+    networks:
+      - my-network
+  notes:
+    image: notes
+    restart: always
+    container_name: notes-test
+    ports:
+      - '8080:8080'
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+      SPRING_DATA_MONGODB_URI: mongodb://mongo-test:27017/notes
+    depends_on:
+      - mongodb
+    networks:
+      - my-network
 
-volumes:
-  dbdata6:
+networks:
+  my-network:
+    driver: bridge
