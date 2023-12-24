@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface NoteRepository extends MongoRepository<Note, String> {
 
-    @Query(value = "{tags: { $eq: ?0 }}")
+    @Query(value = "{tags: { $all: ?0 }}")
     List<Note> findAllFilterTags(List<Tag> tags, PageRequest pageable);
 }

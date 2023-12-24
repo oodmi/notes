@@ -190,10 +190,10 @@ public class NoteControllerTest {
 
     private void createAnotherNote() {
         repository.save(new Note()
-                        .setTitle("Title 2")
-                        .setText("another note is just a note")
-                        .setCreatedDate(LocalDate.of(2023, 12, 24))
-                        .setTags(List.of(Tag.PERSONAL, Tag.IMPORTANT)));
+                .setTitle("Title 2")
+                .setText("another note is just a note")
+                .setCreatedDate(LocalDate.of(2023, 12, 24))
+                .setTags(List.of(Tag.IMPORTANT)));
     }
 
     private String asString(Resource resource) {
