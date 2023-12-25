@@ -9,7 +9,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,28 +65,12 @@ public class NoteService {
     }
 
     public Map<String, Long> getStats(String id) {
-        var node = getById(id);
+        var note = getById(id);
 
-        String[] split = node.getText().split(" ");
-
-        Map<String, Long> map = new HashMap<>();
-
-        for (String s : split) {
-            map.put(s, map.getOrDefault(s, 0L) + 1);
-        }
-
-        return sortByValue(map);
-    }
-
-    public Map<String, Long> sortByValue(Map<String, Long> map) {
-        List<Map.Entry<String, Long>> list = new ArrayList<>(map.entrySet());
-        list.sort((c1, c2) -> c2.getValue().compareTo(c1.getValue()));
-
-        Map<String, Long> result = new LinkedHashMap<>();
-        for (Map.Entry<String, Long> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-
-        return result;
+        return Arrays.stream(note.getText().split("\\s+"))
+                .collect(Collectors.groupingBy(String::toLowerCase, Collectors.counting()))
+                .entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 }
